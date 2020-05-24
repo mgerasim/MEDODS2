@@ -1,0 +1,17 @@
+[Unit]
+Description=Operator Ware
+
+[Service]
+WorkingDirectory=/home/misha/apps/Operware/Server
+ExecStart=/usr/bin/node /home/misha/apps/Operware/Server/start.js
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes:
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=Operware-app
+User=misha
+Environment=NODE_ENV=production
+Environment=PORT=8080
+
+[Install]
+WantedBy=multi-user.target
