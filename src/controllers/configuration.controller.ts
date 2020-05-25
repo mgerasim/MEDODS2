@@ -70,7 +70,7 @@ export class ConfigurationController  {
 
     @Put()
     private putConfiguration(req: Request, res: Response) {
-        Logger.Info(req.params);
+        console.log(req.body);
         const id = req.body.id;
         Configuration.findByPk(id).then(configuration => {
             Object.assign(configuration, req.body);

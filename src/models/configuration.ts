@@ -69,4 +69,11 @@ export class Configuration extends Model<Configuration> {
 
   @Column
   uniqueFieldName: string; 
+
+  @Column
+  townCode5: string;
+  @Column
+  townCode6: string;
+  @Column
+  townCode7: string;
 }

@@ -7,6 +7,7 @@ import moment = require('moment');
 import { isNullOrUndefined } from 'util';
 import { ProcessorVarSet } from './processorVarSet';
 import { ConfigurationVariable } from './models/configurationVariable';
+import { Replacement } from './models/replacement';
 
 const axios = require('axios')
 
@@ -114,19 +115,24 @@ export class Processor {
                 }
 
                 let called_phone_number = isNullOrUndefined(event.Exten) ? event.CallerIDNum : event.Exten ;
-                if (called_phone_number.length === 6) {
-                    called_phone_number = '74212' + called_phone_number;
+                if (called_phone_number.length === 5) {
+                    called_phone_number = '7' + this.configuration.townCode5 + called_phone_number;
+                } if (called_phone_number.length === 6) {
+                    called_phone_number = '7' + this.configuration.townCode6 + called_phone_number;
                 } if (called_phone_number.length === 7) {
-                    called_phone_number = '7423' + called_phone_number;
+                    called_phone_number = '7' + this.configuration.townCode7 + called_phone_number;
                 } else if (called_phone_number.length === 10) {
                     called_phone_number = '7' + called_phone_number;
                 }
 
                 let caller_id = event.CallerIDNum;
+                if (caller_id.length === 5) {
+                    caller_id = '7' + this.configuration.townCode5 + caller_id;
+                }
                 if (caller_id.length === 6) {
-                    caller_id = '74212' + caller_id;
+                    caller_id = '7' + this.configuration.townCode6 + caller_id;
                 } if (caller_id.length === 7) {
-                    caller_id = '7423' + caller_id;
+                    caller_id = '7' + this.configuration.townCode7 + caller_id;
                 } else if (caller_id.length === 10) {
                     caller_id = '7' + caller_id;
                 }
@@ -148,6 +154,18 @@ export class Processor {
                 pbxCallIdField['call_session_id'] = this.reverseString(event[this.configuration.uniqueFieldName].replace(/\D/g, '')).substring(0, 7);
                 Object.assign(callParam['call'], pbxCallIdField);
                 let incomingField = new Object();
+
+
+                console.log(`caller_id = ${caller_id}`);
+
+                const replacements =  await Replacement.findAll();
+                replacements.forEach(replacement => {
+                    if (caller_id === replacement.src) {
+                        caller_id = replacement.dist;
+                        return;
+                    }
+                });
+
                 incomingField['contact_phone_number'] = caller_id;
                 const calledPhoneNumberField = new Object();
                 calledPhoneNumberField['called_phone_number'] = called_phone_number;

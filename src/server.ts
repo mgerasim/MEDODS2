@@ -21,6 +21,7 @@ const asyncWhile = require("async-while");
 import * as schedule from 'node-schedule';
 import { ConfigurationVariable } from './models/configurationVariable';
 import { Callback } from './models/callback';
+import { Replacement } from './models/replacement';
 
 class ExampleServer extends Server {
 
@@ -147,6 +148,7 @@ class ExampleServer extends Server {
         this.app.use('/calls', express.static('public'));
         this.app.use('/calls/*', express.static('public'));
         this.app.use('/callbacks', express.static('public'));
+        this.app.use('/replacement', express.static('public'));
         this.app.use('/configurationVariables', express.static('public'));
         this.app.use('/configuration', express.static('public'));
         this.app.use('/exceptions', express.static('public'));
@@ -257,7 +259,8 @@ class ExampleServer extends Server {
             Variable,
             Event,
             ConfigurationVariable,
-            Callback
+            Callback,
+            Replacement
         ]);
         sequelize.sync();
     }
