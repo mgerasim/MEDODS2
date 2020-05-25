@@ -6,7 +6,7 @@ sudo systemctl stop MEDODS.service
 
 cd ~/apps/MEDODS
 
-sudo git pull origin master
+git pull origin master
 
 npm install
 npm install axios
