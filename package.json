@@ -9,7 +9,7 @@
     "build": "tsc",
     "start": "NODE_ENV=production node dist/Server/start.js",
     "postbuild": "",
-    "deploy": "npm run build && cp -avr ./dist/Server ~/apps/Operware && cp -avr ./node_modules ~/apps/Operware/Server",
+    "deploy": "sh deploy.sh",
     "install-deploy": "sh install.sh"
   },
   "author": "Mikhail Gerasimov",
