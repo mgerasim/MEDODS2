@@ -1,9 +1,9 @@
 [Unit]
-Description=Operator Ware
+Description=MEDODS Integration
 
 [Service]
-WorkingDirectory=/home/misha/apps/MEDODS/Server
-ExecStart=/usr/bin/node /home/misha/apps/MEDODS/Server/start.js
+WorkingDirectory=/home/misha/apps/MEDODS/
+ExecStart=/usr/bin/node /home/misha/apps/MEDODS/dist/Server/start.js
 Restart=always
 # Restart service after 10 seconds if the dotnet service crashes:
 RestartSec=10
@@ -11,7 +11,7 @@ KillSignal=SIGINT
 SyslogIdentifier=MEDODS-app
 User=misha
 Environment=NODE_ENV=production
-Environment=PORT=8070
+Environment=PORT=8080
 
 [Install]
 WantedBy=multi-user.target
