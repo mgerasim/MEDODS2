@@ -16,5 +16,6 @@ sequelize db:migrate --env production
 
 
 sudo systemctl start MEDODS.service
+sudo systemctl status MEDODS.service
 
 
