@@ -4,7 +4,7 @@ git pull origin master
 git push origin master
 sudo systemctl stop MEDODS.service
 
-sudo cd ~/apps/MEDODS
+cd ~/apps/MEDODS
 
 sudo git pull origin master
 
