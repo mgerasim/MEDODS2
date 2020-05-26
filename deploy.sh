@@ -11,10 +11,7 @@ git pull origin master
 npm install
 npm install axios
 npm run build
-
 sequelize db:migrate --env production
-
-
 sudo systemctl start MEDODS.service
 sleep .15
 sudo systemctl status MEDODS.service

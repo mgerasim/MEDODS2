@@ -165,6 +165,12 @@ export class Processor {
                         return;
                     }
                 });
+                replacements.forEach(replacement => {
+                    if (called_phone_number === replacement.src) {
+                        called_phone_number = replacement.dist;
+                        return;
+                    }
+                });
 
                 incomingField['contact_phone_number'] = caller_id;
                 const calledPhoneNumberField = new Object();
