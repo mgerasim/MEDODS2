@@ -165,6 +165,11 @@ export class Processor {
                         return;
                     }
                 });
+
+                if (+called_phone_number < 1000) {
+                    return;
+                }
+
                 replacements.forEach(replacement => {
                     if (called_phone_number === replacement.src) {
                         called_phone_number = replacement.dist;
