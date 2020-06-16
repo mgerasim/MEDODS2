@@ -12,7 +12,7 @@ import { Replacement } from './models/replacement';
 const axios = require('axios')
 
 export class Processor {
-    
+
     processorVarSet: ProcessorVarSet;
 
     constructor(private configuration: Configuration) {
@@ -24,7 +24,7 @@ export class Processor {
         try {
             await Event.create(event);
             if (event.Event !== 'VarSet') {
-//                console.log(event);
+                //                console.log(event);
             }
         } catch (err) {
             console.error('error save event');
@@ -32,7 +32,7 @@ export class Processor {
         }
 
         if (event[this.configuration.uniqueFieldName] === undefined) {
-           // console.log(event);
+            // console.log(event);
             return;
         }
 
@@ -70,17 +70,16 @@ export class Processor {
             }
 
             if (configurationVariable.sourceFieldValue.includes(event[configurationVariable.sourceFieldName])
-                && configurationVariable.sourceFieldValue2.includes(event[configurationVariable.sourceFieldName2]))
-                {
-                    try {
-                        await this.processorVarSet.eventHandle(configurationVariable.title,
-                            event[configurationVariable.sourceField],
-                            event[this.configuration.uniqueFieldName]);  
-                    }  catch (err) {
-                        console.error(`error processorVarSet eventHandle ${configurationVariable.title}`);
-                        console.error(err.message);
-                    }
+                && configurationVariable.sourceFieldValue2.includes(event[configurationVariable.sourceFieldName2])) {
+                try {
+                    await this.processorVarSet.eventHandle(configurationVariable.title,
+                        event[configurationVariable.sourceField],
+                        event[this.configuration.uniqueFieldName]);
+                } catch (err) {
+                    console.error(`error processorVarSet eventHandle ${configurationVariable.title}`);
+                    console.error(err.message);
                 }
+            }
         });
 
         if (event.Event === 'Newstate'
@@ -94,7 +93,7 @@ export class Processor {
             });
             if (call === undefined || call === null) {
                 return;
-           
+
             }
             call.responsibles = isNullOrUndefined(call.responsibles) ? event.CallerIDNum : `${call.responsibles}|${event.CallerIDNum}`;
             await call.save();
@@ -105,8 +104,8 @@ export class Processor {
             if (this.configuration.incomingStartCallValue.includes(event[this.configuration.incomingStartCallField])
                 && this.configuration.incomingStartCallValue2.includes(event[this.configuration.incomingStartCallField2])) {
 
-                    console.log('AMI событие привязки входящего звонка');
-                    console.log(event);
+                console.log('AMI событие привязки входящего звонка');
+                console.log(event);
 
                 const call = await Call.findOne({ where: { pbx_call_id: event[this.configuration.uniqueFieldName] } })
 
@@ -114,7 +113,7 @@ export class Processor {
                     return;
                 }
 
-                let called_phone_number = isNullOrUndefined(event.Exten) ? event.CallerIDNum : event.Exten ;
+                let called_phone_number = isNullOrUndefined(event.Exten) ? event.CallerIDNum : event.Exten;
                 if (called_phone_number.length === 5) {
                     called_phone_number = '7' + this.configuration.townCode5 + called_phone_number;
                 } if (called_phone_number.length === 6) {
@@ -158,7 +157,7 @@ export class Processor {
 
                 console.log(`caller_id = ${caller_id}`);
 
-                const replacements =  await Replacement.findAll();
+                const replacements = await Replacement.findAll();
                 replacements.forEach(replacement => {
                     if (caller_id === replacement.src) {
                         caller_id = replacement.dist;
@@ -166,7 +165,7 @@ export class Processor {
                     }
                 });
 
-                if (+called_phone_number < 1000) {
+                if (called_phone_number.length < 4) {
                     return;
                 }
 
