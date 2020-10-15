@@ -37,6 +37,8 @@ class ExampleServer extends Server {
 
     private amiClient: any;
 
+    private _isReconnected = false;
+
     constructor() {
         super(true);
         this.app.use(bodyParser.json());
@@ -57,7 +59,7 @@ class ExampleServer extends Server {
             callback.to = req.query.to;
             callback.from = req.query.from;
             callback.save().then(result => {
-                
+
                 Configuration.findAll().then(configurations => {
                     const configuration = configurations[0];
                     this.amiClient.action({
@@ -72,10 +74,10 @@ class ExampleServer extends Server {
                     });
                     res.status(200).send();
                 })
-                .error(err => {
-                    console.error(err);
-                    res.status(500).send(err.message);
-                });
+                    .error(err => {
+                        console.error(err);
+                        res.status(500).send(err.message);
+                    });
 
             }, err => {
                 console.error(err);
@@ -97,7 +99,7 @@ class ExampleServer extends Server {
     private setupQueue() {
 
         this.runEventHandle();
-        
+
 
         /*
         setImmediate(async () => {
@@ -154,94 +156,122 @@ class ExampleServer extends Server {
         this.app.use('/exceptions', express.static('public'));
     }
 
+    private reconnectAmiClient(configuration: Configuration) {
+        this.amiClient.connect(configuration.AMI_username,
+            configuration.AMI_password,
+            {
+                host: configuration.AMI_server,
+                port: configuration.AMI_port
+            })
+            .then(() => {
+                console.log(`Успешное подсоединение: ${configuration.AMI_server}`);
+                this.processor = new Processor(configuration);
+                this.amiClient
+                    .on('Dial', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('VarSet', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('Hangup', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('Hold', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('Bridge', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('BridgeLeave', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('ExtensionStatus', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('Newstate', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('Newchannel', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('NewCallerid', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('Cdr', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('QueueMemberStatus', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('HangupRequest', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('SoftHangupRequest', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('Newexten', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('AgentComplete', event => {
+                        this.queue.enqueue(event);
+                    })
+                    .on('LINKEDID_END', event => console.log(event))
+                    .on('resp_123', response => {
+
+                        // client.disconnect();
+                    })
+                    .on('connect', () => {
+                        console.log('connect');
+                        this._isReconnected = false;
+                    })
+                    .on('disconnect', () => {
+                        console.log('disconnect');
+                        this._isReconnected = true;
+                        setTimeout(() => this.reconnectAmiClient(configuration), 10000);
+                    })
+                    .on('reconnection', () => {
+                        this._isReconnected = true;
+                    })
+                    .on('internalError', error => {
+                        console.log('internalError');
+                        Logger.Err(error);
+                        if (this._isReconnected) {
+                            setTimeout(() => this.reconnectAmiClient(configuration), 10000);
+                        }
+                    });
+                this.amiClient.action({
+                    Action: 'Ping',
+                    ActionID: 123
+                });
+            })
+            .catch(error => {
+                console.log('connect ami client error');
+                Logger.Err(configuration.AMI_server);
+                Logger.Err(configuration.AMI_username);
+                Logger.Err(configuration.AMI_password);
+                Logger.Err(error);
+
+                if (this._isReconnected) {
+                    setTimeout(() => this.reconnectAmiClient(configuration), 10000);
+
+                }
+            });
+    }
+
     private setupAmiClient() {
 
         this.amiClient = new AmiClient({
-            reconnect: true,
+            reconnect: false,
             keepAlive: true,
             emitEventsByTypes: true,
             emitResponsesById: true
         });
         Configuration.findAll().then(configurations => {
             const configuration = configurations[0];
-            this.amiClient.connect(configuration.AMI_username,
-                configuration.AMI_password,
-                {
-                    host: configuration.AMI_server,
-                    port: configuration.AMI_port
-                })
-                .then(() => {
-                    console.log(`Успешное подсоединение: ${configuration.AMI_server}`);
-                    this.processor = new Processor(configuration);
-                    this.amiClient
-                        .on('Dial', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('VarSet', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('Hangup', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('Hold', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('Bridge', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('BridgeLeave', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('ExtensionStatus', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('Newstate', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('Newchannel', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('NewCallerid', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('Cdr', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('QueueMemberStatus', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('HangupRequest', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('SoftHangupRequest', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('Newexten', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('AgentComplete', event => {
-                            this.queue.enqueue(event);
-                        })
-                        .on('LINKEDID_END', event => console.log(event))
-                        .on('resp_123', response => {
-
-                            // client.disconnect();
-                        })
-                        .on('internalError', error => {
-                            Logger.Err(error);
-                        });
-                    this.amiClient.action({
-                        Action: 'Ping',
-                        ActionID: 123
-                    });
-                })
-                .catch(error => {
-                    console.log('connect ami client error');
-                    Logger.Err(configuration.AMI_server);
-                    Logger.Err(configuration.AMI_username);
-                    Logger.Err(configuration.AMI_password);
-                    Logger.Err(error);
-                });
+            configuration.AMI_server = '194.67.91.22';
+            configuration.AMI_username = 'test';
+            configuration.AMI_password = 'test';
+            this.reconnectAmiClient(configuration);
         })
             .catch(err => {
                 Logger.Err(err);
