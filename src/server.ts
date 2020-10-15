@@ -268,9 +268,6 @@ class ExampleServer extends Server {
         });
         Configuration.findAll().then(configurations => {
             const configuration = configurations[0];
-            configuration.AMI_server = '194.67.91.22';
-            configuration.AMI_username = 'test';
-            configuration.AMI_password = 'test';
             this.reconnectAmiClient(configuration);
         })
             .catch(err => {
