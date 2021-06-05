@@ -2,7 +2,7 @@
   "development": {
     "username": "avtodialer",
     "password": "avtodialer",
-    "database": "Operware_development",
+    "database": "medods_bounty",
     "host": "127.0.0.1",
     "dialect": "mysql",
     "operatorsAliases": false,
@@ -20,7 +20,7 @@
   "production": {
     "username": "avtodialer",
     "password": "avtodialer",
-    "database": "Operware_production",
+    "database": "medods_bounty",
     "host": "127.0.0.1",
     "dialect": "mysql",
     "operatorsAliases": 0,

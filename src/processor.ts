@@ -185,6 +185,7 @@ export class Processor {
                 console.log(callParam);
                 const body = callParam;
 
+		console.log(this.configuration.authKey);
                 axios.post(`${this.configuration.baseUrl}/api/v2/telephony/common`, body,
                     {
                         headers: {
@@ -196,6 +197,7 @@ export class Processor {
                         console.log('Успешно Отправлено уведомление о входящем звонке');
                     })
                     .catch((error) => {
+			console.error(error);
                         // Exception.create({ message: 'Ошибка при отправке уведомление о входящем звонке', stack: error.stack.substring(0, 254) }).then();
                     })
             }

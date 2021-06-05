@@ -23,6 +23,8 @@ import { ConfigurationVariable } from './models/configurationVariable';
 import { Callback } from './models/callback';
 import { Replacement } from './models/replacement';
 
+import {JwtTokenService} from './jwt_token_service'
+
 class ExampleServer extends Server {
 
     private readonly SERVER_STARTED = 'Example server started on port: ';
@@ -164,7 +166,14 @@ class ExampleServer extends Server {
                 port: configuration.AMI_port
             })
             .then(() => {
-                console.log(`Успешное подсоединение: ${configuration.AMI_server}`);
+                console.log(`Успешное подсоединение : ${configuration.AMI_server}`);
+
+                /*
+                JwtTokenService.Instance.getToken()
+                    .then((token) => console.log(token))
+                    .catch((error) => console.error(error));
+                  */  
+
                 this.processor = new Processor(configuration);
                 this.amiClient
                     .on('Dial', event => {

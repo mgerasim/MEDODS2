@@ -1,0 +1,17 @@
+[Unit]
+Description=MEDODS Integration for Bounty
+
+[Service]
+WorkingDirectory=/home/misha/apps/MEDODS2/
+ExecStart=/usr/bin/node /home/misha/apps/MEDODS2/dist/Server/start.js
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes:
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=MEDODS2-app
+User=misha
+Environment=NODE_ENV=production
+Environment=PORT=8085
+
+[Install]
+WantedBy=multi-user.target
