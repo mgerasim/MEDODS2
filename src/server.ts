@@ -174,7 +174,7 @@ class ExampleServer extends Server {
                     .catch((error) => console.error(error));
                   */  
 
-                this.processor = new Processor(configuration);
+                this.processor = new Processor(configuration, this.amiClient);
                 this.amiClient
                     .on('Dial', event => {
                         this.queue.enqueue(event);

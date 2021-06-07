@@ -8,6 +8,7 @@ import { isNullOrUndefined } from 'util';
 import { ProcessorVarSet } from './processorVarSet';
 import { ConfigurationVariable } from './models/configurationVariable';
 import { Replacement } from './models/replacement';
+import { JwtTokenService } from './jwt_token_service';
 
 const axios = require('axios')
 
@@ -15,7 +16,7 @@ export class Processor {
 
     processorVarSet: ProcessorVarSet;
 
-    constructor(private configuration: Configuration) {
+    constructor(private configuration: Configuration, private amiClient: any) {
         this.processorVarSet = new ProcessorVarSet(configuration);
     }
 
@@ -185,7 +186,6 @@ export class Processor {
                 console.log(callParam);
                 const body = callParam;
 
-		console.log(this.configuration.authKey);
                 axios.post(`${this.configuration.baseUrl}/api/v2/telephony/common`, body,
                     {
                         headers: {
@@ -200,6 +200,52 @@ export class Processor {
 			console.error(error);
                         // Exception.create({ message: 'Ошибка при отправке уведомление о входящем звонке', stack: error.stack.substring(0, 254) }).then();
                     })
+
+
+                    const token = await JwtTokenService.Instance.getToken();
+
+                    console.log(token);
+
+                    console.log(`Запрос получения Клиента по номеру: ${caller_id}`);
+                    axios.get(`${this.configuration.baseUrl}/api/v2/clients?phone=${caller_id}&offset=0&limit=100`, 
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': token
+                        }
+                    })
+                    .then(res => {
+                        console.log(`ОТВЕТ: Запрос получения Клиента по номеру: ${caller_id}`);
+                        console.log(res.data.data);
+                        console.log(res.data.data.length);
+                        if (res.data.data && res.data.data.length > 0) {
+                            const client = res.data.data[0];
+                            
+                            const name = `${client.surname} ${client.name} ${client. secondName}`;
+
+                                try {
+                                    this.amiClient.action({
+                                        Action: 'Setvar',
+                                        ActionID: event.Linkedid,
+                                        Channel: event.Channel,
+                                        Variable: 'medods_callerid_name',
+                                        Value: name
+                                      });
+                                }
+                                catch (err) {
+                                    console.error
+                                }
+
+                              console.log('Успешное отправка номера');
+
+                        }
+                    })
+                    .catch((error) => {
+                        //console.log(error);
+                        console.error(error.response);
+                    });
+                    
+
             }
         }
 

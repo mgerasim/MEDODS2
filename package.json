@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "nodemon --config \"./nodemon.json\"/",
     "build": "tsc",
+    "tail": "sudo journalctl -u MEDODS2.service -b -e",
     "start": "NODE_ENV=production node dist/Server/start.js",
     "postbuild": "",
     "deploy": "sh deploy.sh",

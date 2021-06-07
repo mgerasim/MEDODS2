@@ -22,32 +22,29 @@ export class JwtTokenService {
 
   constructor() {
     
-    this.identity = '933aebfe-36f4-4707-957c-cf4d5719930f'
-    this.secretKey = 'ec082aac00555318a9672779aed465ceb5216a426ef4b562ea942e5a142167ee'
+    this.identity = '1f239f55-2041-4208-b62a-2d46690b1363'
+    this.secretKey = 'a21b799790bed61264f614e51a1fa1ef3d6c78b4fdefef90a147b153b3dee77d'
     this.tokenExpirationTime = 64
     this.token = null
     this.updateTokenPromise = null
 
     this.initialize();
-  //  this.getToken = this.getToken.bind(this)
-  //  this.updateToken = this.updateToken.bind(this)
+    //this.getToken = this.getToken.bind(this)
+    //this.updateToken = this.updateToken.bind(this)
   }
 
   initialize() {
     console.log('initialize');
     const interval = (this.tokenExpirationTime / 2) * 1000
-    setInterval(this.updateToken, interval)
+    setInterval(() => this.updateToken(), interval)
 
     this.updateToken()
   }
 
   getToken() {
-      console.log('getToken');
       if (this.token) {
-        console.log("token = 3")
         return Promise.resolve(this.token);
       }
-      console.log('updateTokenPromise')
       return this.updateTokenPromise;
   }
 
@@ -63,6 +60,7 @@ export class JwtTokenService {
       // expiration
       const exp = iat + this.tokenExpirationTime
 
+    
       jwt.sign(
         { iss, iat, exp },
         this.secretKey,
@@ -80,6 +78,6 @@ export class JwtTokenService {
       .catch(err => console.error(err))
       .finally(() => { this.updateTokenPromise = null })
 
-    return this.getToken()
+    //return this.getToken()
   }
 }
